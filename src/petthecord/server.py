@@ -1,6 +1,7 @@
 from io import BytesIO
+from typing import NoReturn
 
-from aiohttp.web import Application, StreamResponse, get, Request, Response
+from aiohttp.web import Application, StreamResponse, get, HTTPFound, Request, Response
 from discord import NotFound, HTTPException
 from discord.ext import commands
 from petpetgif import petpet
@@ -11,9 +12,17 @@ class Server(Application):
         self.client = client
         super().__init__()
 
-        self.add_routes([get("/{uid}", self.root)])
+        self.add_routes(
+            [
+                get("/{uid}", self.petpet),
+                get("/", self.root)
+            ]
+        )
 
-    async def root(self, request: Request) -> StreamResponse:
+    async def root(self, _: Request) -> NoReturn:
+        raise HTTPFound("https://github.com/nakidai/petthecord")
+
+    async def petpet(self, request: Request) -> StreamResponse:
         try:
             uid = int(request.match_info["uid"][:request.match_info["uid"].find('.')])
         except ValueError:
