@@ -13,3 +13,7 @@ help is desribed in the `--help`.
 
 To get UserID you should enable developer mode in your client and "Copy User ID"
 option will appear when you do RMB on user.
+
+### Instances
+Also there's a working instance of this thing which is located at
+`ptc.nakidai.ru`
