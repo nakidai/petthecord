@@ -1,3 +1,6 @@
+# FOR PEOPLE WHO JUST WANNA USE IT
+Click [there](https://discord.com/oauth2/authorize?client_id=1280933495845290005) and use the `/petpet` command
+
 PetTheCord
 --
 This is a Web API for petting any user you know which has avatar
