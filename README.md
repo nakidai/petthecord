@@ -25,13 +25,13 @@ Also there's a working instance of this thing which is located at
 This project was rewritten several times, so this is a list of simillar APIs:
 
 - [messengernew/petpet-api](https://github.com/messengernew/petpet-api)
- - Written in **Rust**
- - Instance: [`https://petpet.quadratik.pro/`](https://petpet.quadratik.pro/)
+    * Written in **Rust**
+    * Instance: [`https://petpet.quadratik.pro/`](https://petpet.quadratik.pro/)
 
 - [wavy-cat/petpet-go](https://github.com/wavy-cat/petpet-go)
- - Written in **Go**
- - Instance: [`https://pet.wavycat.ru/`](https://pet.wavycat.ru/)
+    * Written in **Go**
+    * Instance: [`https://pet.wavycat.ru/`](https://pet.wavycat.ru/)
 
 - [nakidai/cptc](https://github.com/nakidai/cptc)
- - Written in **C**
- - There're no any instances of it :<
+    * Written in **C**
+    * There're no any instances of it :<
