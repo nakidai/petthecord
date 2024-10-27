@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from logging import Formatter, StreamHandler, Logger, getLogger
 from os import getenv
 from sys import argv, stderr
 
@@ -57,6 +58,14 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    # logger = getLogger()
+    # handler = StreamHandler()
+    # handler.setFormatter(
+    #     Formatter("[{asctime}] [{levelname:<8}] {name}: {message}", '%Y-%m-%d %H:%M:%S', style="{")
+    # )
+    # logger.addHandler(handler)
+    # logger.log(1, "Hello!")
+
     bot = Bot(
         args.host,
         args.port,
@@ -67,10 +76,10 @@ def main() -> None:
         args.cache_gc_delay
     )
     if (token := getenv("PETTHECORD_TOKEN")) is not None:
-        bot.run(token)
+        bot.run(token, root_logger=True)
     elif (token_path := getenv("PETTHECORD_TOKEN_FILE")) is not None:
         with open(token_path) as f:
             token = f.read()
-        bot.run(token)
+        bot.run(token, root_logger=True)
     else:
         print(f"{argv[0]}: Neither PETTHECORD_TOKEN nor PETTHECORD_TOKEN_FILE are set", file=stderr)

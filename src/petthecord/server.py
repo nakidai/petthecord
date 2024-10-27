@@ -1,6 +1,7 @@
 from asyncio import sleep
 from json import load, dumps
 from io import BytesIO
+from logging import getLogger
 from os import listdir, remove
 from os.path import getmtime
 from pathlib import Path
@@ -30,9 +31,13 @@ class Server(Application):
         self.cache_gc_delay = cache_gc_delay
         super().__init__()
 
+        self._logger = getLogger("petthecord.server")
+        self._cache_logger = getLogger("petthecord.cache")
+
         if self.caching:
             index_path = self.cache_path / "index.json"
             if not index_path.exists():
+                self._cache_logger.warning("Cache's index.json doesn't exist, creating...")
                 with open(index_path, "w") as f:
                     f.write("{}")
 
@@ -50,6 +55,7 @@ class Server(Application):
         raise HTTPFound("https://github.com/nakidai/petthecord")
 
     async def petpet(self, request: Request) -> StreamResponse:
+        self._logger.info(f"Incoming '{request.rel_url}' request from {request.remote}")
         try:
             uid = int(request.match_info["uid"][:request.match_info["uid"].find('.')])
         except ValueError:
@@ -68,6 +74,7 @@ class Server(Application):
         avatar_path = str(self.cache_path / f"{user.id}_{user.avatar.key}.gif")
         if self.caching:
             if (path := self.cache.get(user.id)) != avatar_path:
+                self._cache_logger.debug("Regenerating cached avatar {user.id}")
                 if path:
                     remove(path)
                 self.cache[user.id] = avatar_path
@@ -93,13 +100,18 @@ class Server(Application):
                 return Response(body=f.read(), content_type="image/gif")
 
     async def clean_cache(self) -> None:
+        self._cache_logger.info("Starting new cache's gc iteration")
+
         for filename in listdir(self.cache_path):
             path = (self.cache_path / filename)
             if path.is_file() and filename != "index.json":
                 if (time() - getmtime(path) > self.cache_lifetime):
+                    self._cache_logger.debug(f"Removing {filename}")
                     del self.cache[filename.split('_')[0]]
                     remove(path)
         with open(self.cache_path / "index.json", "w") as f:
             f.write(dumps(self.cache))
+
+        self._cache_logger.debug("Finished collecting old cache")
 
         await sleep(self.cache_gc_delay)

@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from aiohttp.web import AppRunner, TCPSite
 from discord import app_commands, Interaction, Intents, User
 from discord.ext import commands
@@ -9,6 +11,10 @@ class PatTheCordCog(commands.Cog):
     def __init__(self, client: commands.Bot, origin: str = "https://ptc.pwn3t.ru") -> None:
         self.client = client
         self.origin = origin
+
+        super().__init__()
+
+        self._logger = getLogger("petthecord.bot")
 
     @app_commands.allowed_installs(users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
@@ -27,6 +33,7 @@ class PatTheCordCog(commands.Cog):
         user: User,
         r: str = ""
     ) -> None:
+        self._logger.info(f"Petting {user.id} for {interaction.user.id}")
         await interaction.response.send_message(f"{self.origin}/{user.id}.{r}.gif")
 
 
@@ -54,6 +61,8 @@ class Bot(commands.Bot):
         self._cache_lifetime = cache_lifetime
         self._cache_gc_delay = cache_gc_delay
 
+        self._logger = getLogger("petthecord")
+
     async def on_ready(self) -> None:
         await self.add_cog(PatTheCordCog(self, self._origin))
         await self.tree.sync()
@@ -69,6 +78,8 @@ class Bot(commands.Bot):
         await runner.setup()
         site = TCPSite(runner, self._host, self._port)
         await site.start()
+
+        getLogger("petthecord.server").info(f"Started serving on {self._host}:{self._port}")
 
         if self._caching:
             await server.clean_cache()
