@@ -107,19 +107,20 @@ class Server(Application):
                 return Response(body=f.read(), content_type="image/gif")
 
     async def clean_cache(self) -> None:
-        if self.caching:
-            self._cache_logger.info("Starting new cache's gc iteration")
+        while True:
+            if self.caching:
+                self._cache_logger.info("Starting new cache's gc iteration")
 
-            for filename in listdir(self.cache_path):
-                path = (self.cache_path / filename)
-                if path.is_file() and filename != "index.json":
-                    if (time() - getmtime(path) > self.cache_lifetime):
-                        self._cache_logger.debug(f"Removing {filename}")
-                        del self.cache[filename.split('_')[0]]
-                        remove(path)
-            with open(self.cache_path / "index.json", "w") as f:
-                f.write(dumps(self.cache))
+                for filename in listdir(self.cache_path):
+                    path = (self.cache_path / filename)
+                    if path.is_file() and filename != "index.json":
+                        if (time() - getmtime(path) > self.cache_lifetime):
+                            self._cache_logger.debug(f"Removing {filename}")
+                            del self.cache[filename.split('_')[0]]
+                            remove(path)
+                with open(self.cache_path / "index.json", "w") as f:
+                    f.write(dumps(self.cache))
 
-            self._cache_logger.debug("Finished collecting old cache")
+                self._cache_logger.debug("Finished collecting old cache")
 
-        await sleep(self.cache_gc_delay)
+            await sleep(self.cache_gc_delay)
