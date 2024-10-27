@@ -83,7 +83,7 @@ class Server(Application):
             Path(avatar_path).touch()
 
             with open(avatar_path, "rb") as f:
-                return Response(body=f.read(), content_type="image/png")
+                return Response(body=f.read(), content_type="image/gif")
         else:
             with BytesIO() as f:
                 image = await user.avatar.read()
@@ -91,7 +91,7 @@ class Server(Application):
 
                 f.seek(0)
 
-                return Response(body=f.read(), content_type="image/png")
+                return Response(body=f.read(), content_type="image/gif")
 
     async def clean_cache(self) -> None:
         for filename in listdir(self.cache_path):
