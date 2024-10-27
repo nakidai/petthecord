@@ -50,7 +50,6 @@ class Server(Application):
         raise HTTPFound("https://github.com/nakidai/petthecord")
 
     async def petpet(self, request: Request) -> StreamResponse:
-        print(request)
         try:
             uid = int(request.match_info["uid"][:request.match_info["uid"].find('.')])
         except ValueError:
