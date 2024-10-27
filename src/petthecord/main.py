@@ -24,6 +24,12 @@ def main() -> None:
         help="Bind IP"
     )
     parser.add_argument(
+        "-o", "--origin",
+        default="https://ptc.pwn3t.ru",
+        metavar="PATH",
+        help="Root of the bot"
+    )
+    parser.add_argument(
         "-d", "--cache-dir",
         default="/var/cache/petthecord",
         metavar="PATH",
@@ -54,6 +60,7 @@ def main() -> None:
     bot = Bot(
         args.host,
         args.port,
+        args.origin,
         not args.no_cache,
         args.cache_dir,
         args.cache_lifetime,
