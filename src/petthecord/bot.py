@@ -30,19 +30,42 @@ class PatTheCordCog(commands.Cog):
 
 
 class Bot(commands.Bot):
-    def __init__(self, host: str = "127.0.0.1", port: int = 8080) -> None:
+    def __init__(
+        self,
+
+        host: str = "127.0.0.1",
+        port: int = 8080,
+        caching: bool = True,
+        cache_path: str = "/var/cache/petthecord",
+        cache_lifetime: int = 86400,
+        cache_gc_delay: int = 14400,
+    ) -> None:
         super().__init__(
             command_prefix="!",
             intents=Intents.default()
         )
         self._host = host
         self._port = port
+        self._caching = caching
+        self._cache_path = cache_path
+        self._cache_lifetime = cache_lifetime
+        self._cache_gc_delay = cache_gc_delay
 
     async def on_ready(self) -> None:
         await self.add_cog(PatTheCordCog(self))
         await self.tree.sync()
 
-        runner = AppRunner(Server(self))
+        server = Server(
+            self,
+            self._caching,
+            self._cache_path,
+            self._cache_lifetime,
+            self._cache_gc_delay
+        )
+        runner = AppRunner(server)
         await runner.setup()
         site = TCPSite(runner, self._host, self._port)
         await site.start()
+
+        if self._caching:
+            await server.clean_cache()

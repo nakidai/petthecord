@@ -1,4 +1,10 @@
+from asyncio import sleep
+from json import load, dumps
 from io import BytesIO
+from os import listdir, remove
+from os.path import getmtime
+from pathlib import Path
+from time import time
 from typing import NoReturn
 
 from aiohttp.web import Application, StreamResponse, get, HTTPFound, Request, Response
@@ -8,9 +14,30 @@ from petpetgif import petpet
 
 
 class Server(Application):
-    def __init__(self, client: commands.Bot) -> None:
+    def __init__(
+        self,
+
+        client: commands.Bot,
+        caching: bool = True,
+        cache_path: str = "/var/cache/petthecord",
+        cache_lifetime: int = 86400,
+        cache_gc_delay: int = 14400,
+    ) -> None:
         self.client = client
+        self.caching = caching
+        self.cache_path = Path(cache_path)
+        self.cache_lifetime = cache_lifetime
+        self.cache_gc_delay = cache_gc_delay
         super().__init__()
+
+        if self.caching:
+            index_path = self.cache_path / "index.json"
+            if not index_path.exists():
+                with open(index_path, "w") as f:
+                    f.write("{}")
+
+            with open(index_path, "r") as f:
+                self.cache = load(f)
 
         self.add_routes(
             [
@@ -23,6 +50,7 @@ class Server(Application):
         raise HTTPFound("https://github.com/nakidai/petthecord")
 
     async def petpet(self, request: Request) -> StreamResponse:
+        print(request)
         try:
             uid = int(request.match_info["uid"][:request.match_info["uid"].find('.')])
         except ValueError:
@@ -38,9 +66,41 @@ class Server(Application):
         if user.avatar is None:
             return Response(status=404)
 
-        image = await user.avatar.read()
-        dest = BytesIO()
-        petpet.make(BytesIO(image), dest)
-        dest.seek(0)
+        avatar_path = str(self.cache_path / f"{user.id}_{user.avatar.key}.gif")
+        if self.caching:
+            if (path := self.cache.get(user.id)) != avatar_path:
+                if path:
+                    remove(path)
+                self.cache[user.id] = avatar_path
+                with open(self.cache_path / "index.json", "w") as f:
+                    f.write(dumps(self.cache))
 
-        return Response(body=dest.getvalue(), content_type="image/png")
+            if not Path(avatar_path).exists():
+                with open(avatar_path, "wb") as f:
+                    image = await user.avatar.read()
+                    petpet.make(BytesIO(image), f)
+
+            Path(avatar_path).touch()
+
+            with open(avatar_path, "rb") as f:
+                return Response(body=f.read(), content_type="image/png")
+        else:
+            with BytesIO() as f:
+                image = await user.avatar.read()
+                petpet.make(BytesIO(image), f)
+
+                f.seek(0)
+
+                return Response(body=f.read(), content_type="image/png")
+
+    async def clean_cache(self) -> None:
+        for filename in listdir(self.cache_path):
+            path = (self.cache_path / filename)
+            if path.is_file() and filename != "index.json":
+                if (time() - getmtime(path) > self.cache_lifetime):
+                    del self.cache[filename.split('_')[0]]
+                    remove(path)
+        with open(self.cache_path / "index.json", "w") as f:
+            f.write(dumps(self.cache))
+
+        await sleep(self.cache_gc_delay)
