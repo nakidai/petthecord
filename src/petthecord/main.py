@@ -1,9 +1,8 @@
 from argparse import ArgumentParser
-from logging import Formatter, StreamHandler, Logger, getLogger
 from os import getenv
 from sys import argv, stderr
 
-from .bot import Bot
+from .runner import Bot
 
 
 def main() -> None:
@@ -57,14 +56,6 @@ def main() -> None:
         help="Delay between cache's garbage collector runs in seconds"
     )
     args = parser.parse_args()
-
-    # logger = getLogger()
-    # handler = StreamHandler()
-    # handler.setFormatter(
-    #     Formatter("[{asctime}] [{levelname:<8}] {name}: {message}", '%Y-%m-%d %H:%M:%S', style="{")
-    # )
-    # logger.addHandler(handler)
-    # logger.log(1, "Hello!")
 
     bot = Bot(
         args.host,
