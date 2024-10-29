@@ -104,7 +104,10 @@ class CachedPet:
                     if path.is_file() and filename != "index.json":
                         if (time() - getmtime(path) > self._lifetime):
                             self._logger.debug(f"Removing {filename}")
-                            del self._cache[filename.split('_')[0]]
+                            try:
+                                del self._cache[filename.split('_')[0]]
+                            except KeyError:
+                                pass
                             remove(path)
                 with open(self._path / "index.json", "w") as f:
                     dump(self._cache, f)
