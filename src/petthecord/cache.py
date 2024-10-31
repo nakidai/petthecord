@@ -71,7 +71,10 @@ class CachedPet:
             if (path := self._cache.get(user.id)) != str(avatar_path):
                 self._logger.debug("Generating new gif for {user.id}")
                 if path:
-                    remove(path)
+                    try:
+                        remove(path)
+                    except OSError:
+                        self._logger.warning("no {path} was found when replacing avatar")
                 self._cache[user.id] = str(avatar_path)
                 with open(self._path / "index.json", "w") as f:
                     dump(self._cache, f)
