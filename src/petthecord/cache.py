@@ -104,10 +104,11 @@ class CachedPet:
                     if path.is_file() and filename != "index.json":
                         if (time() - getmtime(path) > self._lifetime):
                             self._logger.debug(f"Removing {filename}")
+                            to_delete = filename.split('_')[0]
                             try:
-                                del self._cache[filename.split('_')[0]]
+                                del self._cache[to_delete]
                             except KeyError:
-                                pass
+                                self._logger.warning(f"{to_delete} has been already removed from the index")
                             remove(path)
                 with open(self._path / "index.json", "w") as f:
                     dump(self._cache, f)
