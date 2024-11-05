@@ -9,7 +9,7 @@ from .cache import CachedPet
 from .server import Server
 
 
-class PetTheCord(commands.Bot):
+class PetTheCord(commands.AutoShardedBot):
     def __init__(
         self,
 
@@ -20,10 +20,12 @@ class PetTheCord(commands.Bot):
         cache_path: str = "/var/cache/petthecord",
         cache_lifetime: int = 86400,
         cache_gc_delay: int = 14400,
+        shard_count: int = 1,
     ) -> None:
         super().__init__(
             command_prefix="!",
-            intents=Intents.default()
+            intents=Intents.default(),
+            shard_count=shard_count,
         )
         self._host = host
         self._port = port

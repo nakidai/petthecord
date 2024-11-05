@@ -55,6 +55,13 @@ def main() -> None:
         metavar="TIME",
         help="Delay between cache's garbage collector runs in seconds"
     )
+    parser.add_argument(
+        "-c", "--shards",
+        default=1,
+        type=int,
+        metavar="COUNT",
+        help="Amount of shards to create"
+    )
     args = parser.parse_args()
 
     bot = PetTheCord(
@@ -64,7 +71,8 @@ def main() -> None:
         not args.no_cache,
         args.cache_dir,
         args.cache_lifetime,
-        args.cache_gc_delay
+        args.cache_gc_delay,
+        args.shards,
     )
     if (token := getenv("PETTHECORD_TOKEN")) is not None:
         bot.run(token, root_logger=True)
