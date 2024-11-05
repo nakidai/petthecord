@@ -9,7 +9,7 @@ from .cache import CachedPet
 from .server import Server
 
 
-class Bot(commands.Bot):
+class PetTheCord(commands.Bot):
     def __init__(
         self,
 

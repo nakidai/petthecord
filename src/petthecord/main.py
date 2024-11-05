@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from os import getenv
 from sys import argv, stderr
 
-from .runner import Bot
+from .runner import PetTheCord
 
 
 def main() -> None:
@@ -57,7 +57,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    bot = Bot(
+    bot = PetTheCord(
         args.host,
         args.port,
         args.origin,
