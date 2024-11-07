@@ -28,7 +28,7 @@ def main() -> None:
     parser.add_argument(
         "-o", "--origin",
         default=Defaults.Network.ORIGIN,
-        metavar="PATH",
+        metavar="URL",
         help="Root of the bot"
     )
     parser.add_argument(
