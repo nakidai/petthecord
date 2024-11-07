@@ -3,11 +3,11 @@ from typing import NoReturn
 
 from aiohttp.web import Application, StreamResponse, get, HTTPFound, Request, Response
 
-from .cache import CachedPet, HTTPException, NotFound
+from .petter import Petter, HTTPException, NotFound
 
 
 class Server(Application):
-    def __init__(self, petter: CachedPet) -> None:
+    def __init__(self, petter: Petter) -> None:
         self._petter = petter
         super().__init__()
 

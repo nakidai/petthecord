@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from os import getenv
 from sys import argv, stderr
 
+from .petter import CacheEnvironmentFail, CachedPetter, Petter
 from .runner import PetTheCord
 
 
@@ -64,14 +65,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    try:
+        petter = CachedPetter(
+            args.cache_dir,
+            args.cache_lifetime,
+            args.cache_gc_delay,
+        )
+    except CacheEnvironmentFail:
+        petter = Petter()
+
     bot = PetTheCord(
         args.host,
         args.port,
         args.origin,
-        not args.no_cache,
-        args.cache_dir,
-        args.cache_lifetime,
-        args.cache_gc_delay,
+        petter,
         args.shards,
     )
     if (token := getenv("PETTHECORD_TOKEN")) is not None:
