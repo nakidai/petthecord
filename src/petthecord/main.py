@@ -32,16 +32,16 @@ def main() -> None:
         help="Root of the bot"
     )
     parser.add_argument(
-        "-d", "--cache-dir",
-        default=Defaults.Cache.PATH,
-        metavar="PATH",
-        help="Directory for cache storing"
-    )
-    parser.add_argument(
         "-n", "--no-cache",
         action="store_true",
         default=not Defaults.Cache.CACHING,
         help="Turn off the cache"
+    )
+    parser.add_argument(
+        "-d", "--cache-dir",
+        default=Defaults.Cache.PATH,
+        metavar="PATH",
+        help="Directory for cache storing"
     )
     parser.add_argument(
         "-l", "--cache-lifetime",
