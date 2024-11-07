@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from os import getenv
 from sys import argv, stderr
 
+from .defaults import Defaults
 from .petter import CacheEnvironmentFail, CachedPetter, Petter
 from .runner import PetTheCord
 
@@ -13,66 +14,69 @@ def main() -> None:
     )
     parser.add_argument(
         "-p", "--port",
-        default=8000,
+        default=Defaults.Network.PORT,
         type=int,
         metavar="PORT",
         help="Bind port"
     )
     parser.add_argument(
         "-i", "--host",
-        default="127.0.0.1",
+        default=Defaults.Network.HOST,
         metavar="HOST",
         help="Bind IP"
     )
     parser.add_argument(
         "-o", "--origin",
-        default="https://ptc.pwn3t.ru",
+        default=Defaults.Network.ORIGIN,
         metavar="PATH",
         help="Root of the bot"
     )
     parser.add_argument(
         "-d", "--cache-dir",
-        default="/var/cache/petthecord",
+        default=Defaults.Cache.PATH,
         metavar="PATH",
         help="Directory for cache storing"
     )
     parser.add_argument(
         "-n", "--no-cache",
         action="store_true",
-        default=False,
+        default=not Defaults.Cache.CACHING,
         help="Turn off the cache"
     )
     parser.add_argument(
         "-l", "--cache-lifetime",
-        default=86400,
+        default=Defaults.Cache.LIFETIME,
         type=int,
         metavar="TIME",
         help="Lifetime of cached avatar in seconds"
     )
     parser.add_argument(
         "-s", "--cache-gc-delay",
-        default=14400,
+        default=Defaults.Cache.GC_DELAY,
         type=int,
         metavar="TIME",
         help="Delay between cache's garbage collector runs in seconds"
     )
     parser.add_argument(
         "-c", "--shards",
-        default=1,
+        default=Defaults.SHARDS_COUNT,
         type=int,
         metavar="COUNT",
         help="Amount of shards to create"
     )
     args = parser.parse_args()
 
-    try:
-        petter = CachedPetter(
-            args.cache_dir,
-            args.cache_lifetime,
-            args.cache_gc_delay,
-        )
-    except CacheEnvironmentFail:
+    if args.no_cache:
         petter = Petter()
+    else:
+        try:
+            petter = CachedPetter(
+                args.cache_dir,
+                args.cache_lifetime,
+                args.cache_gc_delay,
+            )
+        except CacheEnvironmentFail:
+            petter = Petter()
 
     bot = PetTheCord(
         args.host,

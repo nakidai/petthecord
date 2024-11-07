@@ -3,9 +3,11 @@ from logging import getLogger
 from discord import app_commands, Interaction, User
 from discord.ext import commands
 
+from .defaults import Defaults
+
 
 class PetTheCordCog(commands.Cog):
-    def __init__(self, origin: str = "https://ptc.pwn3t.ru") -> None:
+    def __init__(self, origin: str = Defaults.Network.ORIGIN) -> None:
         self._origin = origin
         super().__init__()
 

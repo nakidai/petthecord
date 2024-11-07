@@ -9,6 +9,7 @@ from typing import NoReturn
 
 from discord import User
 
+from ..defaults import Defaults
 from .exceptions import CacheEnvironmentFail, NotFound
 from .petter import Petter
 
@@ -17,9 +18,9 @@ class CachedPetter(Petter):
     def __init__(
         self,
 
-        path: str | PathLike = "/var/cache/petthecord",
-        lifetime: int = 86400,
-        gc_delay: int = 14400,
+        path: str | PathLike = Defaults.Cache.PATH,
+        lifetime: int = Defaults.Cache.LIFETIME,
+        gc_delay: int = Defaults.Cache.GC_DELAY,
     ) -> None:
         super().__init__()
 

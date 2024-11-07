@@ -5,6 +5,7 @@ from discord import Intents
 from discord.ext import commands
 
 from .bot import PetTheCordCog
+from .defaults import Defaults
 from .petter import CachedPetter, Petter
 from .server import Server
 
@@ -13,9 +14,9 @@ class PetTheCord(commands.AutoShardedBot):
     def __init__(
         self,
 
-        host: str = "127.0.0.1",
-        port: int = 8080,
-        origin: str = "https://ptc.pwn3t.ru",
+        host: str = Defaults.Network.HOST,
+        port: int = Defaults.Network.PORT,
+        origin: str = Defaults.Network.ORIGIN,
         petter: Petter | None = None,
         shard_count: int = 1,
     ) -> None:
