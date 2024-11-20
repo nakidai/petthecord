@@ -7,8 +7,12 @@ from .petter import Petter, HTTPException, NotFound
 
 
 class Server(Application):
-    def __init__(self, petter: Petter) -> None:
-        self._petter = petter
+    def __init__(
+        self,
+
+        petter: Petter | None = None,
+    ) -> None:
+        self._petter = petter or Petter()
         super().__init__()
 
         self._logger = getLogger(__name__)
